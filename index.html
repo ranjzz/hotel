@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Reservation System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #3f51b5;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .section {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .section h3 {
+            margin-top: 0;
+            color: #3f51b5;
+        }
+
+        input, select, button {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #3f51b5;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #303f9f;
+        }
+
+        .output {
+            margin-top: 10px;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-line;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3f51b5;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .card {
+            background-color: #fafafa;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+        }
+
+        .card p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>🏨 Hotel Reservation System</h2>
+    </header>
+
+    <div class="container">
+        <!-- Add Room -->
+        <div class="section">
+            <h3>Add Room</h3>
+            <input type="number" id="roomNumber" placeholder="Room Number">
+            <input type="text" id="roomType" placeholder="Room Type">
+            <input type="number" id="roomPrice" placeholder="Price per Night">
+            <button onclick="addRoom()">Add Room</button>
+            <div id="addRoomOutput" class="output"></div>
+        </div>
+
+        <!-- Book Room -->
+        <div class="section">
+            <h3>Book Room</h3>
+            <input type="text" id="customerName" placeholder="Customer Name">
+            <input type="text" id="customerPhone" placeholder="Customer Phone">
+            <input type="text" id="customerId" placeholder="Customer ID Proof">
+            <input type="number" id="bookRoomNumber" placeholder="Room Number">
+            <input type="date" id="checkIn">
+            <input type="date" id="checkOut">
+            <button onclick="bookRoom()">Book Room</button>
+            <div id="bookRoomOutput" class="output"></div>
+        </div>
+
+        <!-- Cancel Reservation -->
+        <div class="section">
+            <h3>Cancel Reservation</h3>
+            <input type="text" id="cancelName" placeholder="Customer Name">
+            <input type="number" id="cancelRoomNumber" placeholder="Room Number">
+            <button onclick="cancelReservation()">Cancel Reservation</button>
+            <div id="cancelOutput" class="output"></div>
+        </div>
+
+        <!-- Check Availability -->
+        <div class="section">
+            <h3>Available Rooms</h3>
+            <button onclick="checkAvailability()">Show Available Rooms</button>
+            <div id="availabilityOutput" class="grid"></div>
+        </div>
+
+        <!-- View Reservations -->
+        <div class="section">
+            <h3>All Reservations</h3>
+            <button onclick="viewReservations()">Show Reservations</button>
+            <div id="reservationsOutput" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        const rooms = [];
+        const reservations = [];
+
+        class Room {
+            constructor(number, type, price) {
+                this.number = number;
+                this.type = type;
+                this.price = price;
+                this.available = true;
+            }
+        }
+
+        class Customer {
+            constructor(name, phone, idProof) {
+                this.name = name;
+                this.phone = phone;
+                this.idProof = idProof;
+            }
+        }
+
+        class Reservation {
+            constructor(customer, room, checkIn, checkOut) {
+                this.customer = customer;
+                this.room = room;
+                this.checkIn = new Date(checkIn);
+                this.checkOut = new Date(checkOut);
+                this.totalBill = this.calculateBill();
+            }
+            calculateBill() {
+                const diffTime = Math.abs(this.checkOut - this.checkIn);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays * this.room.price;
+            }
+        }
+
+        function addRoom() {
+            const number = parseInt(document.getElementById('roomNumber').value);
+            const type = document.getElementById('roomType').value;
+            const price = parseFloat(document.getElementById('roomPrice').value);
+
+            if (!number || !type || !price) {
+                document.getElementById('addRoomOutput').innerText = 'Please fill all fields';
+                return;
+            }
+
+            rooms.push(new Room(number, type, price));
+            document.getElementById('addRoomOutput').innerText = `Room ${number} added successfully`;
+        }
+
+        function bookRoom() {
+            const name = document.getElementById('customerName').value;
+            const phone = document.getElementById('customerPhone').value;
+            const idProof = document.getElementById('customerId').value;
+            const roomNumber = parseInt(document.getElementById('bookRoomNumber').value);
+            const checkIn = document.getElementById('checkIn').value;
+            const checkOut = document.getElementById('checkOut').value;
+
+            const room = rooms.find(r => r.number === roomNumber && r.available);
+            if (!room) {
+                document.getElementById('bookRoomOutput').innerText = 'Room not available or does not exist';
+                return;
+            }
+            if (new Date(checkIn) >= new Date(checkOut)) {
+                document.getElementById('bookRoomOutput').innerText = 'Check-out must be after check-in';
+                return;
+            }
+
+            const customer = new Customer(name, phone, idProof);
+            const reservation = new Reservation(customer, room, checkIn, checkOut);
+            reservations.push(reservation);
+            room.available = false;
+            document.getElementById('bookRoomOutput').innerText = `Room booked successfully. Total bill: $${reservation.totalBill}`;
+        }
+
+        function cancelReservation() {
+            const name = document.getElementById('cancelName').value;
+            const roomNumber = parseInt(document.getElementById('cancelRoomNumber').value);
+
+            const index = reservations.findIndex(r => r.customer.name === name && r.room.number === roomNumber);
+            if (index === -1) {
+                document.getElementById('cancelOutput').innerText = 'Reservation not found';
+                return;
+            }
+
+            reservations[index].room.available = true;
+            reservations.splice(index, 1);
+            document.getElementById('cancelOutput').innerText = 'Reservation cancelled successfully';
+        }
+
+        function checkAvailability() {
+            const outputDiv = document.getElementById('availabilityOutput');
+            outputDiv.innerHTML = '';
+            const availableRooms = rooms.filter(r => r.available);
+            if (availableRooms.length === 0) {
+                outputDiv.innerText = 'No rooms available';
+                return;
+            }
+            availableRooms.forEach(r => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `<p><strong>Room ${r.number}</strong></p>
+                                  <p>Type: ${r.type}</p>
+                                  <p>Price: $${r.price}</p>`;
+                outputDiv.appendChild(card);
+            });
+        }
+
+        function viewReservations() {
+            const outputDiv = document.getElementById('reservationsOutput');
+            if (reservations.length === 0) {
+                outputDiv.innerText = 'No reservations yet';
+                return;
+            }
+
+            let table = `<table>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Phone</th>
+                                <th>ID Proof</th>
+                                <th>Room</th>
+                                <th>Check-in</th>
+                                <th>Check-out</th>
+                                <th>Bill</th>
+                            </tr>`;
+            reservations.forEach(r => {
+                table += `<tr>
+                            <td>${r.customer.name}</td>
+                            <td>${r.customer.phone}</td>
+                            <td>${r.customer.idProof}</td>
+                            <td>${r.room.number}</td>
+                            <td>${r.checkIn.toISOString().split('T')[0]}</td>
+                            <td>${r.checkOut.toISOString().split('T')[0]}</td>
+                            <td>$${r.totalBill}</td>
+                          </tr>`;
+            });
+            table += '</table>';
+            outputDiv.innerHTML = table;
+        }
+    </script>
+</body>
+</html>
