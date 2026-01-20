@@ -1,33 +1,20 @@
 # Hotel Reservation System (Java)
 
-## 📌 Project Overview
-This is a **console-based Hotel Reservation System** developed using **Core Java**.  
-The project demonstrates the use of **Object-Oriented Programming (OOP)** concepts and provides basic hotel booking functionalities.
+This is a simple **Hotel Reservation System** built as a **website** using HTML, CSS, and JavaScript.  
+It allows users to:
 
-This project is suitable for:
-- College mini project
-- Training demonstration
-- Java practice
+- Add rooms
+- Book rooms
+- Cancel reservations
+- Check available rooms
+- View all reservations
 
----
+## Features
 
-## 🛠️ Technologies Used
-- Java (Core Java)
-- OOP Concepts
-- Collections (ArrayList)
-- Command Line Interface
+- Frontend-only simulation (no backend required)
+- Dynamic updates for room availability and reservations
+- Easy to run by just opening `index.html` in a browser
 
----
-
-## ✨ Features
-- Add hotel rooms
-- View room availability
-- Book a room
-- Cancel reservation
-- Calculate total bill
-- Menu-driven console application
-
----
 UI
 https://ranjzz.github.io/hotel/
 
